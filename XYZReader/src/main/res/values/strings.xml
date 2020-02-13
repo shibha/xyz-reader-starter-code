@@ -8,5 +8,7 @@
     <string name="action_share">Share</string>
 
     <string name="up">Up</string>
+    <string name="data_type">text/plain</string>
+    <string name="sample_text">Some sample text</string>
 
 </resources>

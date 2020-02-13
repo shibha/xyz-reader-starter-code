@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
@@ -17,8 +18,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.os.Bundle;
-import android.support.v4.app.ShareCompat;
-import android.support.v7.graphics.Palette;
+import androidx.core.app.ShareCompat;
+import androidx.palette.graphics.Palette;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -143,10 +144,11 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Activity parentActivity = getActivity();
                 startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
-                        .getIntent(), getString(R.string.action_share)));
+                        .setType(parentActivity.getString(R.string.data_type))
+                        .setText(parentActivity.getString(R.string.sample_text))
+                        .getIntent(), getActivity().getString(R.string.action_share)));
             }
         });
 
@@ -189,8 +191,6 @@ public class ArticleDetailFragment extends Fragment implements
             String date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
             return dateFormat.parse(date);
         } catch (ParseException ex) {
-            Log.e(TAG, ex.getMessage());
-            Log.i(TAG, "passing today's date");
             return new Date();
         }
     }
@@ -214,16 +214,17 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
-            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-                bylineView.setText(Html.fromHtml(
-                        DateUtils.getRelativeTimeSpanString(
-                                publishedDate.getTime(),
-                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
 
+            StringBuilder stringToDisplay = new StringBuilder();
+            stringToDisplay.append(DateUtils.getRelativeTimeSpanString(
+                    publishedDate.getTime(),
+                    System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_ALL).toString()).
+                    append( " by <font color='#ffffff'>").
+                    append(mCursor.getString(ArticleLoader.Query.AUTHOR)).append("</font>");
+
+            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+                bylineView.setText(Html.fromHtml(stringToDisplay.toString()));
             } else {
                 // If date is before 1902, just show the string
                 bylineView.setText(Html.fromHtml(
