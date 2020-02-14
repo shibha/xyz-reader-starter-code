@@ -104,7 +104,7 @@
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_width="@dimen/share_fab_size"
         android:layout_height="@dimen/share_fab_size"
-        android:srcCompat="@drawable/ic_share"
+        android:src="@drawable/ic_share"
         android:elevation="@dimen/fab_elevation"
         android:contentDescription="@string/action_share"
         app:backgroundTint="@color/theme_accent"
